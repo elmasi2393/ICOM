@@ -29,6 +29,7 @@ SimMatrix::SimMatrix(size_t dim_){
     dim = dim_;
 
     values = new vector<double>[dim];   //Asigno memoria para los vectores
+    
     for(int i = 0; i < dim; i++){
         values[i].resize(i+1);          //Asigno cada dimension de los vectores
     }
