@@ -38,7 +38,7 @@ SimMatrix::SimMatrix(const SimMatrix &other){
 
     this->values = new vector<double>[dim]; //Asigno memoria para los vectores
     for(int i = 0; i < dim; i++){
-        for(int j = 0; j < dim; j++){
+        for(int j = 0; j < i+1; j++){
             values[i].push_back(other.values[i][j]);
         }
     }
@@ -140,6 +140,8 @@ int main(){
     cout << "-------------- SUMA ------------------" << endl;
     SimMatrix * m3 = sumaSimMatrix(matrix, m2);
     m3->print();
+
+    delete m3;
 
     return 0; 
 }
