@@ -13,8 +13,27 @@ const int NUM_CICLOS = 100000;
 using namespace std; 
 
 
+// int main(int argc, char **argv){
+
+//     double y = 0, phi = 0;
+//     int N = 0;
+//     srand(time(0));
+
+//     for(int i = 0; i < NUM_CICLOS; i++){
+//         y = 1.0 * rand()/RAND_MAX; //Defino posicion
+//         phi = rand(); //Defino el seno del angulo
+
+//         cout << "y: " << y << " sin_phi: " << sin(phi) << endl;
+
+//         if((y + sin(phi)) >= 1 || (y + sin(phi) <= 0)) { N++;}    //Verifico si esta entre lineas
+//     }
+//     cout << "N = " << N << endl;
+//     cout << "pi: " << 2*NUM_CICLOS/double(N) << endl;
+// }
+
 int main(int argc, char **argv){
 
+    
     double y = 0, phi = 0;
     int N = 0;
     srand(time(0));
