@@ -8,15 +8,15 @@
 using namespace std;
 
 #define ALPHABET_SIZE 26
-// función auxiliar: retorna el indice que le corresponde a un caracter dado
+// funciï¿½n auxiliar: retorna el indice que le corresponde a un caracter dado
 static int getIndexForChar(int c)
 {
-	int ret = toupper(c) - 'A';     //  calcula el indice pasando la letra a mayúscula
+	int ret = toupper(c) - 'A';     //  calcula el indice pasando la letra a mayï¿½scula
 	assert(ret >= 0 && ret < ALPHABET_SIZE);
 	return ret;
 }
 
-// función auxiliar: retorna el caracter que le corresponde a un indice dado
+// funciï¿½n auxiliar: retorna el caracter que le corresponde a un indice dado
 static char getCharForIndex(int i)
 {
 	assert(i >= 0 && i < ALPHABET_SIZE);
@@ -68,10 +68,11 @@ struct Trie {
 			int index = getIndexForChar(key[level]);
 			if( pCursor->children[index] == nullptr )
 				pCursor->children[index] = new TrieNode;
-			pCursor = pCursor->children[index];
+			pCursor = pCursor->children[index];		//Quedo apuntando al ultimo nodo
 		}
-		// marca defineKey en el último valor de pCursor si es que no estaba ya definido como clave
-		if (pCursor->defineKey == false) {
+		//Cuando se llega al final, marca el nodo como que define una clave
+		// marca defineKey en el ï¿½ltimo valor de pCursor si es que no estaba ya definido como clave
+		if (pCursor->defineKey == false) {	
 			pCursor->defineKey = true;
 			numKeys++;   // aumento la cantidad de claves del trie
 		}
@@ -109,15 +110,44 @@ struct Trie {
 	}
 
 	TrieNode *root;		    // contenedor real de datos
-	unsigned int numKeys = 0;	// número de claves en el trie
+	unsigned int numKeys = 0;	// nï¿½mero de claves en el trie
 };
 
 // TODO
-void trieGetEnabledKeys(const Trie* trie, const char* prefix, bool enabledKeys[ALPHABET_SIZE]);
+void trieGetEnabledKeys(const Trie* trie, const char* prefix, bool enabledKeys[ALPHABET_SIZE]){
+	TrieNode* keyNode = trie->searchPrefix(prefix);	//Indica el TrieNode donde termina
+
+	for(size_t i = 0; i < ALPHABET_SIZE;  i++){		//Activo los caracteres que estan habilitados para ese TrieNode
+		if(keyNode->children[i] != nullptr)			//Si el nodo se expande, significa que esa letra esta habilitada
+			enabledKeys[i] = true;	//Establesco en true si existe el nodo
+		else						
+			enabledKeys[i] = false;	//Establesco en false si no existe el nodo
+	}
+	return;
+}
 
 // TODO
 using ListWord = list<string>;
-ListWord trieGetKeys(const Trie* trie, const char* prefix);
+ListWord trieGetKeys(const Trie* trie, const char* prefix){
+	ListWord list;
+
+	TrieNode* keyNode = trie->searchPrefix(prefix);	//Indica el TrieNode donde termina
+
+	for(size_t i = 0; i < ALPHABET_SIZE; i++){	//Recorro todos los nodos
+		if(keyNode->children[i] != nullptr)	{	//Si el puntero es no nulo, significa que existe el nodo y agrego la palabra
+			string word = prefix;			//Agrego el prefijo
+			cout << "Agrego: " << word << endl;
+			word += getCharForIndex(i);	//Agrego la letra
+			if(keyNode->children[i]->defineKey){	//Si la letra que expando define una palabra
+				list.push_back(word);	//Agrego la palabra a la lista
+				cout << "Word pushed: " << word << endl;
+			}
+			ListWord listAux = trieGetKeys(trie, word.c_str());	//Busco las palabras que se expanden de esa letra
+			list.splice(list.end(), listAux);	//Agrego las palabras a la lista
+		}
+	}
+	return list;
+}
 
 int main()
 {
