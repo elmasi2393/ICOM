@@ -1,0 +1,8 @@
+raiz 3
+menu0 0
+menu1 3
+menu10 0
+menu11 0
+menu12 0
+menu2 1
+hola20 0	
