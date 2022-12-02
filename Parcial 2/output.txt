@@ -1,0 +1,9 @@
+No hay loops algebraicos en el diagrama bloques_sin.txt
+Encontre 5 loops algebraicos en el diagrama bloques_con.txt
+[IntegralGain]->[LimitedIntegrator]->[Sum]->[Saturation]->[Pendulum/Mux1]->[Pendulum/Fcn1]->[Pendulum/Integrator4]->[Pendulum/Integrator1]->[Sum2]->[...]
+[IntegralGain]->[LimitedIntegrator]->[Sum]->[Saturation]->[Pendulum/Mux]->[Pendulum/Fcn2]->[Pendulum/Intergrator3]->[Pendulum/Mux1]->[Pendulum/Fcn1]->[Pendulum/Integrator4]->[Pendulum/Integrator1]->[Sum2]->[...]
+[IntegralGain]->[LimitedIntegrator]->[Sum]->[Saturation]->[Pendulum/Mux]->[Pendulum/Fcn2]->[Pendulum/Intergrator3]->[Pendulum/Integrator2]->[Pendulum/Mux1]->[Pendulum/Fcn1]->[Pendulum/Integrator4]->[Pendulum/Integrator1]->[Sum2]->[...]
+[Pendulum/Fcn2]->[Pendulum/Intergrator3]->[Pendulum/Mux]->[...]
+[Pendulum/Fcn2]->[Pendulum/Intergrator3]->[Pendulum/Integrator2]->[Pendulum/Mux]->[...]
+
+
