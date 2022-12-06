@@ -44,7 +44,7 @@ class Block
 		// busca recursivamente todos los loops algebraicos comenzando desde este bloque
 		// y va armando todos los loops que encuentra en la lista que retorna
 		list<AlgebraicLoop> getAlgebraicLoops(); //TODO
-		AlgebraicLoop search_loops(Block *block);
+		// AlgebraicLoop search_loops(Block *block);
 	private:
 		// nombre del bloque
 		string name;
@@ -102,6 +102,11 @@ void Block::connectBlock(Block*b)
 {
 	output.push_back(b);
 }
+//Funcion q busque todos los loops
+list<AlgebraicLoop> Block::getAlgebraicLoops(){
+	
+}
+
 // list<AlgebraicLoop> Block::getAlgebraicLoops(){
 // 	static list<AlgebraicLoop> res;	//Creo una lista donde ir metiendo las cosas
 
@@ -144,10 +149,13 @@ void Block::connectBlock(Block*b)
 // AlgebraicLoop Block::search_loops(Block *block){
 // 	static AlgebraicLoop loop;
 
-// 	// if(block == nullptr)
-// 	// 	return AlgebraicLoop();	//Si el bloque es nulo, devuelvo un loop vacio
 // 	if(block->direct_feedthrough == 0)	//Pregunta si es de alimentacion directa
 // 		return AlgebraicLoop();
+// 	if(block == this){
+// 		AlgebraicLoop p;
+// 		p.addBlock(this);
+// 		return p;
+// 	}
 // 	if(!block->visitado){	//Pregunto si un bloque fue visitado
 // 		block->visitado = true;	//Lo visito
 // 		for(int i = 0; i < block->output.size(); i++){	//Chequeo en cada una de las salidas del bloque
