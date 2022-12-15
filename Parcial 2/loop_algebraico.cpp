@@ -103,9 +103,7 @@ void Block::connectBlock(Block*b)
 	output.push_back(b);
 }
 //Funcion q busque todos los loops
-list<AlgebraicLoop> Block::getAlgebraicLoops(){
-	
-}
+// list<AlgebraicLoop> Block::getAlgebraicLoops(){}
 
 // list<AlgebraicLoop> Block::getAlgebraicLoops(){
 // 	static list<AlgebraicLoop> res;	//Creo una lista donde ir metiendo las cosas
