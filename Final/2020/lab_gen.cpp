@@ -67,6 +67,32 @@ public:
             cout << e.what() << endl;
         }
     }
+    Laberinto(string path){
+        ifstream file(path);
+        if (!file.is_open()){
+            cout << "Error: " << path << endl;
+        }else{
+            string line;
+            while(getline(file, line)){
+                txtrep.push_back(line);
+                // cout << line.size() << endl;
+                line.clear();
+            }
+        }
+        nc = txtrep.at(0).size();
+        nf = txtrep.size();
+
+        //Busco inicio y fin
+        for(int i=0; i<nf; i++){
+            for(int j=0; j<nc; j++){
+                if(txtrep.at(i).at(j) == entrada)
+                    begin = Celda{i, j};
+                if(txtrep.at(i).at(j) == salida)
+                	end = Celda{i, j};
+            }
+        }
+        // cout << txtrep.size() << endl;
+    }
 	// imprime el laberinto (es idéntica a la del parcial)
     void print() const
     {
@@ -141,6 +167,7 @@ public:
             }
             print();
             clear_map();
+            i++;
             
         }
 
@@ -220,10 +247,10 @@ private:
         // print();
         if(i.c < 0 || i.c >= nc || i.f < 0 || i.f >= nf)    //Si me voy de los limites, retorno
         	return;
-        if(i == end){    //Si llegue al final, dejo de pisar caminos
-            txtrep[i.f][i.c] = salida_visitada; //Visito la salida
-        	return;
-        }
+        // if(i == end){    //Si llegue al final, dejo de pisar caminos
+        //     txtrep[i.f][i.c] = salida_visitada; //Visito la salida
+        // 	// return;
+        // }
         char c = txtrep.at(i.f).at(i.c);
         if(c == espacio_visitado || c == entrada_visitada)  //Si la la visite, retorno
         	return;
@@ -232,6 +259,8 @@ private:
         //marco mi actua como visitada
         if(c == entrada)
             txtrep[i.f][i.c] = entrada_visitada;
+        else if (c == salida)
+            txtrep[i.f][i.c] = salida_visitada;
         else
         	txtrep[i.f][i.c] = espacio_visitado;
         //voy de manera aleatoria a las celdas a una distancia de 2
@@ -241,25 +270,25 @@ private:
             // cout << a << endl;
             switch (a)
             {
-            case ARRIBA:
+            case DERECHA:
                 if(txtrep[i.f+2][i.c] == espacio || txtrep[i.f+2][i.c] == salida){          //Si el vecino de +2 esta libre
                     txtrep[i.f+1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
                     generate_path(Celda{i.f+2, i.c});        //Busco caminos a partir del vecino
                 }
                 break;
-            case ABAJO:
+            case IZQUIERDA:
                 if(txtrep[i.f-2][i.c] == espacio || txtrep[i.f-2][i.c] == salida){          //Si el vecino de +2 esta libre
                     txtrep[i.f-1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
                     generate_path(Celda{i.f-2, i.c});        //Busco caminos a partir del vecino
                 }
                 break;
-            case IZQUIERDA:
+            case ABAJO:
                 if(txtrep[i.f][i.c-2] == espacio || txtrep[i.f][i.c-2] == salida){          //Si el vecino de +2 esta libre
                     txtrep[i.f][i.c-1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
                     generate_path(Celda{i.f, i.c-2});        //Busco caminos a partir del vecino
                 }
             	break;
-            case DERECHA:
+            case ARRIBA:
                 if(txtrep[i.f][i.c+2] == espacio || txtrep[i.f][i.c+2] == salida){          //Si el vecino de +2 esta libre
                     txtrep[i.f][i.c+1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
                     generate_path(Celda{i.f, i.c+2});        //Busco caminos a partir del vecino
@@ -284,12 +313,14 @@ private:
 };
 
 int main(){
-    Laberinto a(101, 101);
+    // srand(time(0));
+    Laberinto a(51, 51);
+    // Laberinto a("laberinto_tomi.txt");
 
     a.print();
-    a.save_lab("laberinto.txt");
+    // a.save_lab("laberinto.txt");
     a.print_solucion();
-    a.print();
+    // a.print();
     
 
     return 0;

@@ -10,7 +10,7 @@ using WorkUnitId = unsigned int;
 
 // describe una accion: 
 struct ActionDescriptor {
-    string accion;          // descripción de la accion
+    string accion;          // descripciï¿½n de la accion
     Tick   neededTime;      // tiempo necesario para llevarla a cabo (en Ticks)
 };
 
@@ -22,17 +22,24 @@ class WorkUnit {
         }
         
         // agrega una nueva accion al workunit
-        void addAction(const string& action, Tick t); // TODO
+        void addAction(const string& action, Tick t){
+            actionHistory.push_back(AppliedAction{action, t}); 
+        }
 
         // imprime el id del workunit y todas las acciones aplicadas
         // para cada accion debe imprimir el tiempo de aplicacion y la descripcion de la accion
-        void listActions();   // TODO
+        void listActions(){
+            for(auto a: actionHistory){
+                cout << "accion: " << a.action << endl;
+                cout << "tiempo: " << a.time << endl;
+            }
+        }
 
     private:
         WorkUnitId id;              // identificacion de la accion
         // describe una accion aplicada al WorkUnit
         struct AppliedAction {      
-            string action;          // descripción de la accion realizada
+            string action;          // descripciï¿½n de la accion realizada
             Tick time;              // tiempo en que se le aplico la accion
         };
         // conjunto de acciones que se le aplicaron al WorkUnit
@@ -47,7 +54,7 @@ class XferQueue {
             queue.push_back(pwu);
         }
 
-        // retorna el elemento más viejo en la cola (la cola NO debe estar vacía)
+        // retorna el elemento mï¿½s viejo en la cola (la cola NO debe estar vacï¿½a)
         WorkUnit *get() {
             assert(!isEmpty());
             WorkUnit* ret = queue.front();
@@ -82,30 +89,36 @@ class Stage {
 // 0, 1, 2, 3, ...
 class Producer: public Stage {
     public:
-        Producer(XferQueue* qout_, Tick tbwu_);   // TODO
+        Producer(XferQueue* qout_, Tick tbwu_): Stage(), qout(qout_), tbwu(tbwu_) {}
 
         // a cada tbwu ticks debe generar un nuevo WorkUnit y ponerlo en la cola de salida
-        void doTick(Tick t);   // TODO
-
+        void doTick(Tick t){
+            if((t % tbwu) == 0){
+                WorkUnit * pwu = new WorkUnit(id, tbwu);   //Creamos acciones randoms
+                id++;
+                qout->put(pwu); //Lo pongo en la cola de salida
+            }
+        }
     private:
         XferQueue* qout;
         const Tick tbwu;
-        // TODO
-        // ...
-
+        int id = 0;
 };
 
 // describe un stage consumidor de workunits
-// lo unico que debe hacer con los Workunits que saca de qin es listarle las acciones de transformación
+// lo unico que debe hacer con los Workunits que saca de qin es listarle las acciones de transformaciï¿½n
 // que recibio y destruir la accion
 class Consumer : public Stage {
     public:
-        Consumer(XferQueue* qin_);   // TODO
-
-
+        Consumer(XferQueue* qin_): Stage(), qin(qin_) {}
         // si hay algo en la cola de entreda debe consumirlo, listar las acciones de transformacion
         // que le fueron aplicadas y destruir la WorkUnit
-        void doTick(Tick t);   // TODO
+        void doTick(Tick t){
+            if(!qin->isEmpty()){
+                WorkUnit * toDo = qin->get();
+                toDo->listActions();
+            }
+        }
 
     private:
         XferQueue* qin;
@@ -114,30 +127,50 @@ class Consumer : public Stage {
 // describe los stages de transformacion
 // se construye con un puntero a la cola de entrada, uno a la cola de salida y un
 // conjunto de acciones que describen las transformaciones que realiza el stage.
-// El estado de creación del stage es IDLE (no se esta procesando ninguna WorUnit)
+// El estado de creaciï¿½n del stage es IDLE (no se esta procesando ninguna WorUnit)
 // cuando se consigue un WorkUnit para a estado WORKING y cuando termina de aplicarle
 // todas las acciones pasa nuevamente a estado IDLE.
 class WorkingStage : public Stage {
     public:
-        WorkingStage(XferQueue* qin_, XferQueue* qout_, const vector<ActionDescriptor>& actions_);   // TODO
-
+        WorkingStage(XferQueue* qin_, XferQueue* qout_, const vector<ActionDescriptor>& actions_): Stage(), qin(qin_), qout(qout_), actions(actions_) {}
         // en estado IDLE chequea si hay algo en qin, si lo hay lo saca y cambia a WORKING y inicializa lo que necesite
         // para tener informacion de las acciones que se van a ir aplicando.
         //  en estado WORKING va aplicando las acciones de acuerdo a los tiempos necesarios 
         // para cada accion, las acciones que va aplicando deben ser agregadas a la WorkUnit WorkUnit::addAction
-        void doTick(Tick t);  // TODO
+        void doTick(Tick t){
+            // cout << "TICK " << t << endl;
+            if(state == IDLE){
+            	if(!qin->isEmpty()){
+                    toDo = qin->get();
+                    state = WORKING;
+                }
+            }else{   
+                if((t-timeCurrent)% actions.at(n).neededTime){    //Si se cumple el tiempo
+                    toDo->addAction(actions.at(n).accion, actions.at(n).neededTime);    //Agrego acciones
+                    n++;    //Aplico la siguiente accion
+                    timeCurrent = t;    //Guardo el tiempo actual
+                }
+                if(n == actions.size()){    //Si ejecute todas las acciones
+                    n = 0;  //Reinicio las acciones
+                    qout->put(toDo);    //Pongo en la lista de salida
+                    state = IDLE;       //Lo dejo libre
+                }
+
+            }
+        }
 
     private:
         XferQueue *qin;
         XferQueue *qout;
         const vector<ActionDescriptor> actions;
-        // TODO
-        // ...
+        WorkUnit * toDo;
+        int n = 0;  //Numero de acciones
+        int timeCurrent = 0;
 
         
 };
 
-// planificador de ejecución
+// planificador de ejecuciï¿½n
 class Scheduler {
     public:
         void registerStage(Stage* stg) {
@@ -167,7 +200,7 @@ int main() {
     // consumer
     Consumer consumer(&q5);
 
-    // acciones de transformación de los distintos WorkinStages
+    // acciones de transformaciï¿½n de los distintos WorkinStages
     vector<ActionDescriptor> s1Actions = {
         {"Presentacion de chasis en marco", 80},
         {"Fijacion soporte motor", 40},
@@ -178,7 +211,7 @@ int main() {
     vector<ActionDescriptor> s2Actions = {
         {"Colocacion puerta izquierda", 50},
         {"Colocacion puerta derecha", 50},
-        {"Calibración de componentes moviles", 140},
+        {"Calibraciï¿½n de componentes moviles", 140},
     };
     vector<ActionDescriptor> s3Actions = {
         {"Aplicacion de pintura base", 50},
@@ -198,8 +231,8 @@ int main() {
     vector<ActionDescriptor> s5Actions = {
         {"Colocacion torpedo de instrumentos", 200},
         {"Colocacion volante", 40},
-        {"Colocación butacas delanteras", 50},
-        {"Colocación butacas traseras", 50},
+        {"Colocaciï¿½n butacas delanteras", 50},
+        {"Colocaciï¿½n butacas traseras", 50},
     };
 
     // working stages
