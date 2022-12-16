@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+// #include <windows.h>
 
 using namespace std;
 
@@ -23,6 +24,8 @@ void ClearScreen()
 // del resto del codigo y complete
 struct Punto2D //TODO
 {
+	int x, y;
+	bool operator==(const Punto2D &e) const { return (x == e.x) && (y == e.y);}
 };
 
 
@@ -32,16 +35,34 @@ class Jugador
 	
 	public:
 	
-	Jugador (Punto2D punto_inicio)
-	: posicion{punto_inicio}	
-	{
-	}	
+	Jugador (Punto2D punto_inicio): posicion{punto_inicio}	{}	
 	
 	// Metodo utilizado para cambiar la posicion del Jugador en base 
     // a la direccion que se le paso como argumento, con la precaucion
     // de no salirse de los limites dados por las 4 paredes
-	void mover(Direccion d, const int limite);	//TODO
-	
+	void mover(Direccion d, const int limite){
+		switch (d)
+		{
+		case arriba:		//Me muevo en las posiciones si no me salgo del mapa
+			if((posicion.y - 1) > 0)
+				posicion.y -= 1;
+			break;
+		case abajo:
+			if((posicion.y + 1) < limite)
+				posicion.y += 1;
+			break;
+		case der:
+			if((posicion.x + 1) < limite)
+				posicion.x += 1;
+				break;
+		case izq:
+			if((posicion.x - 1) > 0)
+				posicion.x -= 1;
+			break;		
+		default:		//Sino no hago nada
+			break;
+		}
+	}
 	
 	Punto2D get_posicion() 
 	{
@@ -84,13 +105,13 @@ class Humano : public Jugador
 	}
 	
 	public:
-	Humano (Punto2D punto_inicio)
-	: Jugador(punto_inicio)
-	{	
-	}
+	Humano (Punto2D punto_inicio) : Jugador(punto_inicio){}
 	
 	//Mueve la posicion del jugador humano en la direccion elegida
-	void mover(const int limite); //TODO
+	void mover(const int limite){
+		Direccion dir = leer_movimiento();	//Leo la direccion donde moverme
+		Jugador::mover(dir, limite);		//Me muevo en la direccion leida
+	}
 	
 	char get_simbolo() 
 	{
@@ -105,15 +126,14 @@ class Zombie : public Jugador
 	const char simbolo='Z';	
 	
 	public:
-	Zombie (Punto2D punto_inicio)
-	: Jugador(punto_inicio)
-	{	
-	}
+	Zombie (Punto2D punto_inicio): Jugador(punto_inicio){}
 	
 	//Mueve la posicion del zombie en una direccion al azar 
     // (arriba, abajo, izq, der o quieto)
-	void mover(const int limite); //TODO
-	
+	void mover(const int limite){
+		Direccion dir = Direccion(rand() % num_dirs);
+		Jugador::mover(dir, limite);
+	}
 	char get_simbolo()
 	{
 		return simbolo;
@@ -129,7 +149,11 @@ class Mapa
 	vector<string> visualizacion;
 	
 	public:
-	Mapa (int tamano_, Punto2D salida_); //TODO
+	Mapa (int tamano_, Punto2D salida_): tamano(tamano_), salida(salida_) {
+		string s (tamano, libre);			//Creo un string con todo vacio
+		for(int i = 0; i < tamano; i++)		//Lo meto en la vosualizacion
+			visualizacion.push_back(s);
+	}
 	
 	void mostrar() 
 	{
@@ -139,9 +163,19 @@ class Mapa
 		cout << endl;
 		
 		for (int i=0; i< visualizacion.size(); i++)
-		{
+		{	
 			cout << pared;
-			cout << visualizacion.at(i);
+			// cout << visualizacion.at(i);
+			for(auto a: visualizacion.at(i)){
+				if(a == 'Z')
+					cout << "\x1b[32m" << a << "\x1b[0m";
+				else if(a == 'H')
+					cout << "\x1b[33m" << a << "\x1b[0m";
+				else if(a == 'S')
+					cout << "\x1B[41m" << a << "\x1b[0m";
+				else
+					cout << a;
+			}
 			cout <<pared << endl;
 		}
 		
@@ -153,13 +187,22 @@ class Mapa
 	// Este metodo debe refrescar el mapa, poniendo todo libre, 
     // y agregando la salida en la posicion adecuada. 
     // Sirve para posteriormente agregar los zombies y el humano.
-	void init(); //TODO
+	void init(){
+		string s (tamano, libre);			//Creo un string con todo vacio
+		for(int i = 0; i < tamano; i++)		//Lo meto en la vosualizacion
+			visualizacion.at(i) = s;
+
+		visualizacion.at(salida.y).at(salida.x) = portal_salida;
+		mostrar();
+	}
 	
 	//Prepara la visualizacion final del juego, dependiendo de si se gano o no.
 	void fin(string s)
-	{
+	{	
+		// cout << "Entro fin" << endl;
 		for (int i=0; i< visualizacion.size(); i++)
-		{
+		{	
+			// cout << "visualizacion" << endl;
 			visualizacion.at(i).clear();
 			for (int j=0; j< tamano; j++)
 			{
@@ -200,7 +243,7 @@ class Juego
 	{
 		for (auto z: zombies)
 		{
-			if (sobreviviente.get_posicion()==z.get_posicion())
+			if (sobreviviente.get_posicion() == z.get_posicion())
 			{
 				estado_fin_juego="DERROTA";
 				return true;
@@ -212,7 +255,7 @@ class Juego
 	//Si el humano llega a la salida: gana el juego
 	bool chequear_salida()
 	{
-		if (sobreviviente.get_posicion()==mapa.get_salida())
+		if (sobreviviente.get_posicion() == mapa.get_salida())
 		{
 			estado_fin_juego="VICTORIA";
 			return true;	
@@ -260,11 +303,29 @@ class Juego
 	
 	// Mueve a los Jugadores y refresca el mapa. Debe luego chequear 
     // si el juego debe terminar.
-	bool avanzar_turno(); //TODO
+	bool avanzar_turno(){
+		sobreviviente.mover(mapa.get_tamano());
+		for(auto &a: zombies)
+			a.mover(mapa.get_tamano());
+		
+		actualizar();
+
+		if(chequear_salida())	//Si estoy en la salida gane
+			return false;
+		if(chequear_zombies())	//Si cruce a algun zombie perdi
+			return false;
+
+		return true;
+	}
 	
 	// Debe poner el mapa en la condicion de finalizacion con estado 
     // de finalizacion adecuado, y mostrarlo en pantalla.
-	void finalizar(); //TODO
+	void finalizar(){
+		// if(estado_fin_juego == "VICTORIA" || estado_fin_juego == "DERROTA")
+		cout << estado_fin_juego << endl;
+		mapa.fin(estado_fin_juego);
+		mapa.mostrar();
+	}
 
 };
 
