@@ -29,6 +29,7 @@ class WorkUnit {
         // imprime el id del workunit y todas las acciones aplicadas
         // para cada accion debe imprimir el tiempo de aplicacion y la descripcion de la accion
         void listActions(){
+            cout << "id: " << id << endl;
             for(auto a: actionHistory){
                 cout << "accion: " << a.action << endl;
                 cout << "tiempo: " << a.time << endl;
@@ -117,6 +118,7 @@ class Consumer : public Stage {
             if(!qin->isEmpty()){
                 WorkUnit * toDo = qin->get();
                 toDo->listActions();
+                delete toDo;
             }
         }
 
@@ -143,9 +145,10 @@ class WorkingStage : public Stage {
             	if(!qin->isEmpty()){
                     toDo = qin->get();
                     state = WORKING;
+                    timeCurrent = t; 
                 }
             }else{   
-                if((t-timeCurrent)% actions.at(n).neededTime){    //Si se cumple el tiempo
+                if((t-timeCurrent) == actions.at(n).neededTime){    //Si se cumple el tiempo
                     toDo->addAction(actions.at(n).accion, actions.at(n).neededTime);    //Agrego acciones
                     n++;    //Aplico la siguiente accion
                     timeCurrent = t;    //Guardo el tiempo actual
@@ -154,9 +157,9 @@ class WorkingStage : public Stage {
                     n = 0;  //Reinicio las acciones
                     qout->put(toDo);    //Pongo en la lista de salida
                     state = IDLE;       //Lo dejo libre
+                    timeCurrent = t; 
                 }
-
-            }
+            } 
         }
 
     private:

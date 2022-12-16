@@ -1,0 +1,11 @@
+PEN 1
+LINE 10 10 100 10
+FONT arial 12
+TEXT Nombre 10 30
+FIELD nombre 50 30
+TEXT Domicilio 10 50
+FIELD domicilio 50 50
+TEXT Documento 10 70
+FIELD dni 50 70
+LINE 10 100 100 100
+BOX 50 50 10 10
