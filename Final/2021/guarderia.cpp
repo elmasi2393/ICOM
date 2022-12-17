@@ -143,25 +143,25 @@ class Guarderia {
                 const PetFood * food_pet = a->getFoodReq(&food);
                 string type_food = food_pet->getFoodName();
                 if(type_food == "DogFood"){
-                    auto it = result.find("DOG");
+                    auto it = result.find(type_food);
                     if(it == result.end())      //Si no estaba, la creo y le asigno la comida
-                        result["DOG"] = food;
+                        result[type_food] = food;
                     else
                         (*it).second += food;   //Sino le sumo lo que necesita otro perro
                 }else if(type_food == "CatFood"){
-                    auto it = result.find("CAT");
+                    auto it = result.find(type_food);
                     if(it == result.end())      //Si no estaba, la creo y le asigno la comida
-                        result["CAT"] = food;
+                        result[type_food] = food;
                     else
-                        (*it).second += food;   //Sino le sumo lo que necesita otro perro
+                        (*it).second += food;   //Sino le sumo lo que necesita otro gato
                 }else if(type_food == "BirdFood"){
-                    auto it = result.find("BIRD");
+                    auto it = result.find(type_food);
                     if(it == result.end())      //Si no estaba, la creo y le asigno la comida
-                        result["BIRD"] = food;
+                        result[type_food] = food;
                     else
-                        (*it).second += food;   //Sino le sumo lo que necesita otro perro
+                        (*it).second += food;   //Sino le sumo lo que necesita otro pajaro
                 }
-
+                //Si no es ninguno, no hago nada
             }
 
             return result;
