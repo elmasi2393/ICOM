@@ -15,7 +15,7 @@ class Trie {
         // o incrementa el repeatCnt si la clave exist�a previamente. 
         void insertKey(const char* key){
             TrieNode* reference = root; //Establesco la primera referencia en el root
-            cout << string(key) << endl;
+            // cout << string(key) << endl;
             for(int i=0; i < strlen(key); i++){
                 int index = getIndexForChar(key[i]); //Busco el indice para el character
                 if(reference->children[index] == nullptr){

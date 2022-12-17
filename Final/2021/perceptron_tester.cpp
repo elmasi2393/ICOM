@@ -10,7 +10,7 @@ using namespace std;
 //tipos de capa
 enum Type {inputLayer,hiddenLayer,outputLayer};
 
-using FunPtr//... //TODO
+using FunPtr = double (*) (double);
 
 //numero de pruebas para ver como anda la red
 const unsigned int N_runs=100;
@@ -33,10 +33,9 @@ struct Node
 	//funcion de activacion del nodo
 	FunPtr activationFunction;
 	
-	Node(FunPtr actFun); //TODO
+	Node(FunPtr actFun): activationFunction(actFun) {}
 	
-	virtual ~Node()
-	{}
+	virtual ~Node(){}
 	
 	//funcion virtual pura. Setea el input_sum a 0 en capas ocultas y de salida, y no debe hacer
 	//nada en capa de entrada 
@@ -49,38 +48,30 @@ struct Node
 	
 	//calcula el valor de output del nodo utilizando la funcion de activacion y el input total, y lo
 	// guarda para su posterior uso
-	void calcOutput();//TODO
-
+	void calcOutput(){
+		output = activationFunction(input_sum);	//Aplico la funcion a los valores de entrada
+	}
 };
 
 //nodos adecuados para capa de entrada
 struct Input: public Node
 {
-	Input()
-	:Node(Identity)
-	{}
-
-
+	Input() :Node(Identity) {}
+	void resetInput() {};	//En la entrada no hace nada
 };
 
 //nodos adecuados para capas ocultas
 struct Hidden: public Node
 {	
-	Hidden()
-	:Node(ReLu)
-	{}
-	
-
+	Hidden():Node(ReLu) {}
+	void resetInput() {	input_sum = 0; };	//Reseteo la suma
 };
 
 //nodos adecuados para capa de salida
 struct Output: public Node
 {	
-	Output()
-	:Node(Sigmoid)
-	{}
-	
-	
+	Output() :Node(Sigmoid) {}
+	void resetInput(){ input_sum = 0; }	//reseteo la suma
 };
 
 //capa
@@ -90,9 +81,30 @@ struct Layer
 	Type layer_type; //tipo de la capa
 	
 	//l_t tipo de capa, N cantidad de nodos en la capa
-	Layer(Type l_t,unsigned short int N); //TODO 
+	Layer(Type l_t,unsigned short int N): layer_type(l_t){
+		switch (layer_type)
+		{
+		case inputLayer:
+			for(int i=0;i<N;i++)
+				neurons.push_back(new Input);
+			break;
+		case hiddenLayer:
+			for(int i=0;i<N;i++)
+				neurons.push_back(new Hidden);
+			break;
+		case outputLayer:
+			for(int i=0;i<N;i++)
+				neurons.push_back(new Output);
+			break;
+		default:
+			break;
+		}
+	} 
 	
-	~Layer(); //TODO
+	~Layer(){
+		for(auto a: neurons)	//Detruyo cada Node
+			delete a;
+	}
 	
 	//para facilitar el acceso al tamaño del vector de "neuronas"
 	unsigned int nsize()
@@ -106,7 +118,8 @@ struct Layer
 		if (layer_type!=inputLayer)
 		{
 			for (unsigned int i=0; i<neurons.size();i++)
-			{
+			{	
+
 					neurons.at(i)->weights = w.at(i);				
 			}
 		}
@@ -194,7 +207,7 @@ class Network
 			f.ignore();
 				
 			layers.push_back(new Layer (outputLayer,N_neurons));
-			
+			cout << "Cargue" << endl;
 			//leo los weights y biases
 			for (unsigned int i=1;i<layers.size();i++)
 			{
@@ -214,18 +227,21 @@ class Network
 					
 					aux_B.push_back(aux_bias);
 				}
-				layers.at(i)->setWeights(W);
-				layers.at(i)->setBias(aux_B);
+				cout << "layer: " << i << endl;
+				cout << layers.at(i)->nsize() << endl;
+
+				layers.at(i)->setWeights(W);	
+				layers.at(i)->setBias(aux_B);	
 				W.clear();
-				aux_B.clear();				
+				aux_B.clear();			
 			}
 			f.close();
 			return true;	
 		}
 		else
 		{
- 		    cout << "Error en la apertura del archivo: " << filename << endl;
- 		    return false;
+			cout << "Error en la apertura del archivo: " << filename << endl;
+			return false;
 		}
 			
 	}
@@ -233,9 +249,21 @@ class Network
 	
 	public:	
 	
-	Network(const string &filename); //TODO
+	Network(const string &filename){
+		try{
+			ok = load_network(filename);
+			if(!loaded())
+				throw std::runtime_error("No se pudo cargar el archivo");
+			cout << layers.size() << endl;
+		}catch(const runtime_error &e){
+			cout << e.what() << endl;
+		}
+	}
 	
-	~Network(); //TODO
+	~Network(){
+		for(auto &a: layers)	//Ejecuto el descontructor de cada layer
+			delete a;
+	}
 	
 	bool loaded()
 	{

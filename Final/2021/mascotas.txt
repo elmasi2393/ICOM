@@ -1,0 +1,10 @@
+DOG Nina 17
+CAT Garfield 14
+DOG Keyna 15
+CAT Micky 10
+DOG Ryuk 24
+BIRD Pepi 0.08
+DOG Pluto 15
+CAT Felix 14
+BIRD Tweety 0.1
+CAT Tom 7
