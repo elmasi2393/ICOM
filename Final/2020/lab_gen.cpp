@@ -6,6 +6,7 @@
 #include <list>
 #include <sstream>
 #include <fstream> 
+#include <time.h>
 
 using namespace std;
 
@@ -214,12 +215,12 @@ private:
     Celda free_cel(){
         int i, j;
         do{
-            i = rand() % (nf-1);    //Selecciono una fila al azar
-        }while(i == 0 && i == nc-1);
+            i = rand() % nf;    //Busco una fila impar
+        }while(!(i%2));
         do{
-            j = rand() % (nc-1); //Selecciono una columna al azar
-        }while((j%2) == 0);
-
+            j = rand() % nc;    //Busco columna impar
+        }while(!(j%2)); 
+        // cout << "i: " << i << " j: " << j << endl;
         return Celda{i, j};
     }
     vector<int> aleatory_secuence(){
@@ -245,12 +246,9 @@ private:
         //Genero un camino aleatorio hasta que llegue a la salida
         // cout << "fila: " << i.f  << " columna: " << i.c << endl;
         // print();
-        if(i.c < 0 || i.c >= nc || i.f < 0 || i.f >= nf)    //Si me voy de los limites, retorno
-        	return;
-        // if(i == end){    //Si llegue al final, dejo de pisar caminos
-        //     txtrep[i.f][i.c] = salida_visitada; //Visito la salida
-        // 	// return;
-        // }
+        // if(i.c < 0 || i.c >= nc || i.f < 0 || i.f >= nf)    //Si me voy de los limites, retorno
+        // 	return;
+
         char c = txtrep.at(i.f).at(i.c);
         if(c == espacio_visitado || c == entrada_visitada)  //Si la la visite, retorno
         	return;
@@ -258,11 +256,11 @@ private:
         //desde mi celda actual
         //marco mi actua como visitada
         if(c == entrada)
-            txtrep[i.f][i.c] = entrada_visitada;
+            txtrep.at(i.f).at(i.c) = entrada_visitada;
         else if (c == salida)
-            txtrep[i.f][i.c] = salida_visitada;
+            txtrep.at(i.f).at(i.c) = salida_visitada;
         else
-        	txtrep[i.f][i.c] = espacio_visitado;
+        	txtrep.at(i.f).at(i.c) = espacio_visitado;
         //voy de manera aleatoria a las celdas a una distancia de 2
         
         vector<int> secuence = aleatory_secuence();
@@ -271,27 +269,35 @@ private:
             switch (a)
             {
             case DERECHA:
-                if(txtrep[i.f+2][i.c] == espacio || txtrep[i.f+2][i.c] == salida){          //Si el vecino de +2 esta libre
-                    txtrep[i.f+1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
-                    generate_path(Celda{i.f+2, i.c});        //Busco caminos a partir del vecino
+                if(i.f+2 < nf){ //Si puedo ir a la derecha
+                    if(txtrep.at(i.f+2).at(i.c) == espacio || txtrep.at(i.f+2).at(i.c) == salida){  //Si el vecino de +2 esta libre
+                        txtrep[i.f+1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
+                        generate_path(Celda{i.f+2, i.c});        //Busco caminos a partir del vecino
+                    }
                 }
                 break;
             case IZQUIERDA:
-                if(txtrep[i.f-2][i.c] == espacio || txtrep[i.f-2][i.c] == salida){          //Si el vecino de +2 esta libre
-                    txtrep[i.f-1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
-                    generate_path(Celda{i.f-2, i.c});        //Busco caminos a partir del vecino
+                if(i.f-2 >0){   //Si puedo ir a la izqueirda
+                    if(txtrep.at(i.f-2).at(i.c) == espacio || txtrep.at(i.f-2).at(i.c) == salida){          //Si el vecino de +2 esta libre
+                        txtrep[i.f-1][i.c] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
+                        generate_path(Celda{i.f-2, i.c});        //Busco caminos a partir del vecino
+                    }
                 }
                 break;
             case ABAJO:
-                if(txtrep[i.f][i.c-2] == espacio || txtrep[i.f][i.c-2] == salida){          //Si el vecino de +2 esta libre
-                    txtrep[i.f][i.c-1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
-                    generate_path(Celda{i.f, i.c-2});        //Busco caminos a partir del vecino
+                if(i.c-2 > 0){  //Si puedo ir apra abajo
+                    if(txtrep.at(i.f).at(i.c-2) == espacio || txtrep.at(i.f).at(i.c-2) == salida){          //Si el vecino de +2 esta libre
+                        txtrep[i.f][i.c-1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
+                        generate_path(Celda{i.f, i.c-2});        //Busco caminos a partir del vecino
+                    }
                 }
             	break;
             case ARRIBA:
-                if(txtrep[i.f][i.c+2] == espacio || txtrep[i.f][i.c+2] == salida){          //Si el vecino de +2 esta libre
-                    txtrep[i.f][i.c+1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
-                    generate_path(Celda{i.f, i.c+2});        //Busco caminos a partir del vecino
+                if(i.c+2 < nc){     //Si puedo ir para arriba
+                    if(txtrep.at(i.f).at(i.c+2) == espacio || txtrep.at(i.f).at(i.c+2) == salida){          //Si el vecino de +2 esta libre
+                        txtrep[i.f][i.c+1] = espacio_visitado;  //Rompo la pared o marco el camino entre medio
+                        generate_path(Celda{i.f, i.c+2});        //Busco caminos a partir del vecino
+                    }
                 }
             	break;
             
@@ -313,7 +319,7 @@ private:
 };
 
 int main(){
-    // srand(time(0));
+    srand(time(NULL));
     Laberinto a(51, 51);
     // Laberinto a("laberinto_tomi.txt");
 
