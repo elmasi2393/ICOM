@@ -1,0 +1,3 @@
+Oracion normal separada por espacios.
+Que,pasa,si,separamos,todo,con,comas?
+Yxsixseparamosxtodoxconxunxsimboloxalfanumerico??
