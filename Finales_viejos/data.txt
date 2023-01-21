@@ -1,0 +1,24 @@
+United-States NC Monroe 34.8782346 -80.6120069 63003
+Bolivia La-Paz El-Alto -16.5477137 -68.206718 77044
+Spain CL Cuellar 41.4024257 -4.310108 9541
+Indonesia Jakarta Jakarta -6.165426 106.8237102 26556
+Mexico CDMX Mexico-D.F. 19.4326077 -99.133208 62738
+Argentina Neuquen Piedra-del-Aguila -40.0482871 -70.0754465 4609
+Spain CL Valladolid 41.6520865 -4.7259729 43653
+Spain CL Salamanca 40.96919 -5.66518 68471
+Spain CL Salamanca 40.9701039 -5.6635397 93702
+Monaco
+Italy Veneto Verona 45.4414066 10.9988524 42227
+Italy Lazio Roma 41.8982838 12.4816727 15220
+Italy Sicilia Palermo 38.1242256 13.35773 77863
+Italy Emilia-Romagna Bologna 44.495704 11.3384508 2480
+Italy Toscana Firenze 43.7846661 11.2729715 63919
+Brasil Rio-Grande-do-Sul
+Brasil Rio-de-Janeiro
+Argentina Rio-Negro San-Carlos-de-Bariloche -41.1334722 -71.3102778 30388
+Argentina Santa-Cruz Las-Heras -46.5394317 -68.929922 36538
+Argentina San-Juan San-Juan -31.5351074 -68.5385941 38420
+Argentina Cordoba Salsipuedes -31.1368964 -64.2964335 55438
+Vatican-City
+Morroco
+Iceland Reykjavik-North

@@ -1,5 +1,7 @@
 *.dSYM
 *.vscode
 *.json
-cplusplus.com
-en.cppreference.com
+cplusplus.com*
+en.cppreference.com*
+cplusplus.com.zip
+en.cppreference.com.zip
